@@ -5,7 +5,10 @@
 
 package sm
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 // TileProvider encapsulates all infos about a map tile provider service (name, url scheme, attribution, etc.)
 type TileProvider struct {
@@ -18,6 +21,8 @@ type TileProvider struct {
 }
 
 func (t *TileProvider) getURL(shard string, zoom, x, y int) string {
+	val := fmt.Sprintf(t.URLPattern, shard, zoom, x, y)
+	fmt.Println(val)
 	return fmt.Sprintf(t.URLPattern, shard, zoom, x, y)
 }
 
@@ -107,7 +112,8 @@ func NewTileProviderMapTiler() *TileProvider {
 	t.Name = "maptiler"
 	t.Attribution = ""
 	t.TileSize = 256
-	t.URLPattern = "https://api.maptiler.com/maps/jp-mierune-gray/256/%[2]d/%[3]d/%[4].png?key=BWMn5p6nWm7JCxUXNiRo"
+	t.URLPattern = "https://api.maptiler.com/maps/" + os.Getenv("MAPTILER_MAP") + "/256/%[2]d/%[3]d/%[4]d.png?key=" + os.Getenv("MAPTILER_KEY")
+	fmt.Println(t.URLPattern)
 	t.Shards = []string{}
 	return t
 }
