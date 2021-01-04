@@ -1,8 +1,3 @@
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/journeyai/go-staticmaps)](https://pkg.go.dev/github.com/journeyai/go-staticmaps)
-[![Go Report Card](https://goreportcard.com/badge/github.com/journeyai/go-staticmaps)](https://goreportcard.com/report/journeyai/go-staticmaps)
-![golang/static](https://github.com/journeyai/go-staticmaps/workflows/golang/static/badge.svg)
-[![License MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/journeyai/go-staticmaps/)
-
 # go-staticmaps
 A fork of https://github.com/flopp/go-staticmaps which add `MapTiler` as a provider
 
