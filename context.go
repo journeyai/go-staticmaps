@@ -19,6 +19,12 @@ import (
 	"github.com/golang/geo/s2"
 )
 
+const (
+	// this is the default zoom level used for maps if there are not higher zoom level
+	// tiles available for that country
+	worldZoomLevel = 5
+)
+
 // Context holds all information about the map image that is to be rendered
 type Context struct {
 	width  int
@@ -45,6 +51,8 @@ type Context struct {
 	tileProvider *TileProvider
 	cache        TileCache
 
+	country      string  // used to detemine what zoom levels are available for the country
+
 	overrideAttribution *string
 }
 
@@ -61,6 +69,11 @@ func NewContext() *Context {
 	t.tileProvider = NewTileProviderOpenStreetMaps()
 	t.cache = NewTileCacheFromUserCache(0777)
 	return t
+}
+
+// SetCountry sets the Country to be used
+func (m *Context) SetCountry(country string) {
+	m.country = country
 }
 
 // SetTileProvider sets the TileProvider to be used
@@ -208,9 +221,14 @@ func (m *Context) determineExtraMarginPixels() float64 {
 }
 
 func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
+	maxZoomLevel := worldZoomLevel
+	if m.country == "JP" {
+		maxZoomLevel = 11 // have zoom levels 5-11 for Japan, so use up to 11
+	}
+
 	b := bounds.AddPoint(center)
 	if b.IsEmpty() || b.IsPoint() {
-		return 15
+		return maxZoomLevel
 	}
 
 	tileSize := m.tileProvider.TileSize
@@ -232,7 +250,7 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	dy := math.Abs(maxY - minY)
 
 	zoom := 1
-	for zoom < 30 {
+	for zoom < maxZoomLevel {
 		tiles := float64(uint(1) << uint(zoom))
 		if dx*tiles > w || dy*tiles > h {
 			return zoom - 1
@@ -240,7 +258,7 @@ func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 		zoom = zoom + 1
 	}
 
-	return 15
+	return maxZoomLevel
 }
 
 // determineCenter computes a point that is visually centered in Mercator projection
