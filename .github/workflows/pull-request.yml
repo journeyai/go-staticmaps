@@ -1,0 +1,39 @@
+name: Create a pull request
+on:
+  push:
+    branches-ignore:
+      - master
+      - production
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  WRIKE_TOKEN: ${{ secrets.WRIKE_TOKEN }}
+jobs:
+
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get Wrike title
+        run: |
+          TASK_NUMBER=$(jq --raw-output '.commits | .[] | .message' "${{ github.event_path }}" | grep -v 'Merge pull request' | tr '\n' ' ' | awk '{gsub(/#/, "\n#")};1' | grep '^#' | awk '{print $1}' | awk -F '#' '{print $2}' | head -n 1)
+          echo "TASK_NUMBER: [[ $TASK_NUMBER ]] "
+          if [ -n "${TASK_NUMBER}" ]; then
+            TASK_ID=$(curl --header "authorization: Bearer $WRIKE_TOKEN" "https://www.wrike.com/api/v4/ids?type=ApiV2Task&ids=\[$TASK_NUMBER\]" | jq --raw-output '.data[].id' | tr '\n' ',' | sed 's/,$//')
+            echo "TASK_ID: [[ $TASK_ID ]]"
+            TASK_TITLE=$(curl https://www.wrike.com/api/v4/tasks/$TASK_ID --header "authorization: Bearer $WRIKE_TOKEN" --header 'content-type: application/json' | jq --raw-output '.data[0].title')
+            echo "TASK_TITLE: [[ ${TASK_TITLE} ]]"
+            echo "TASK_TITLE=${TASK_TITLE} >> $GITHUB_ENV"
+          fi
+      - name: Create PR
+        run: |
+          echo ${TASK_TITLE}
+          TITLE=${TASK_TITLE}
+          if [ -z "$TASK_TITLE" ]; then
+            TITLE=$(echo ${{ github.event.ref }} | sed -E 's/^refs\/heads\/[a-z]+\/(.*)$/\1/' | tr '-' ' ')
+            TITLE="$(tr '[:lower:]' '[:upper:]' <<< ${TITLE:0:1})${TITLE:1}"
+            echo $TITLE
+          fi
+          hub pull-request --draft -b master -h ${{ github.event.ref }} -a ${{ github.event.pusher.name }} -m "$TITLE" || exit 0
