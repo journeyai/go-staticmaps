@@ -21,6 +21,7 @@ type TileProvider struct {
 }
 
 func (t *TileProvider) getURL(shard string, zoom, x, y int) string {
+	fmt.Print(t.URLPattern, shard, zoom, x, y)
 	return fmt.Sprintf(t.URLPattern, shard, zoom, x, y)
 }
 
@@ -115,6 +116,16 @@ func NewTileProviderMapTiler() *TileProvider {
 	return t
 }
 
+// NewTileProviderJourney creates a TileProvider struct for the MapTiler tiles stored in the s3 bucket
+func NewTileProviderJourney() *TileProvider {
+	t := new(TileProvider)
+	t.Name = "journey"
+	t.Attribution = ""
+	t.TileSize = 256
+	t.URLPattern = "https://map-tiles-journey.s3.us-west-1.amazonaws.com/%[2]d/%[3]d/%[4]d.png"
+	t.Shards = []string{}
+	return t
+}
 
 // NewTileProviderOpenCycleMap creates a TileProvider struct for OpenCycleMap's tile service
 func NewTileProviderOpenCycleMap() *TileProvider {
