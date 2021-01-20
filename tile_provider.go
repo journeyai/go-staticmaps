@@ -21,6 +21,7 @@ type TileProvider struct {
 }
 
 func (t *TileProvider) getURL(shard string, zoom, x, y int) string {
+	fmt.Print(t.URLPattern, shard, zoom, x, y)
 	return fmt.Sprintf(t.URLPattern, shard, zoom, x, y)
 }
 
@@ -121,7 +122,7 @@ func NewTileProviderJourney() *TileProvider {
 	t.Name = "journey"
 	t.Attribution = ""
 	t.TileSize = 256
-	t.URLPattern = "https://s3.console.aws.amazon.com/s3/object/map-tiles-journey?region=us-west-1&prefix=tiles/%[2]d/%[3]d/%[4]d.png"
+	t.URLPattern = "https://map-tiles-journey.s3.us-west-1.amazonaws.com/%[2]d/%[3]d/%[4]d.png"
 	t.Shards = []string{}
 	return t
 }

@@ -82,7 +82,7 @@ func (t *TileFetcher) Fetch(zoom, x, y int) (image.Image, error) {
 
 	img, _, err := image.Decode(bytes.NewBuffer(data))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to decode image file from provider: %w", err)
 	}
 
 	if t.cache != nil {
@@ -119,7 +119,7 @@ func (t *TileFetcher) download(url string) ([]byte, error) {
 
 	contents, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to parse response body from provider: %w", err)
 	}
 
 	return contents, nil
