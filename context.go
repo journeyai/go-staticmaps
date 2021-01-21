@@ -222,7 +222,7 @@ func (m *Context) determineExtraMarginPixels() float64 {
 
 func (m *Context) determineZoom(bounds s2.Rect, center s2.LatLng) int {
 	maxZoomLevel := worldZoomLevel
-	if m.country == "JP" {
+	if m.country == "JP" or m.country == "日本" { //JP is for geocoding results, 日本 is Japan from the Japanese administrative boundary set
 		maxZoomLevel = 11 // have zoom levels 5-11 for Japan, so use up to 11
 	}
 
