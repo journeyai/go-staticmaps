@@ -1,15 +1,13 @@
 package sm_test
 
-
 import (
-	"os"
-	"image/color"
-	"image/png"
-	"testing"
 	"github.com/golang/geo/s2"
 	"github.com/journeyai/go-staticmaps"
+	"image/color"
+	"image/png"
+	"os"
+	"testing"
 )
-
 
 func TestMapTiler(t *testing.T) {
 
